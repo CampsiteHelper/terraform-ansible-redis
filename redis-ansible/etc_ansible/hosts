@@ -1,0 +1,7 @@
+# Hosts to deploy Master Redis Cluster
+# ansible-playbook -i hosts redis-cluster.yml
+
+[redis-cluster]
+34.202.114.69 hostname=master01 slot_start=0 slot_end=5400 ip_master=172.31.4.170
+52.203.169.29 hostname=master02 slot_start=5401 slot_end=10800 ip_master=172.31.31.117
+34.202.50.108 hostname=master03 slot_start=10801 slot_end=16383 ip_master=172.31.35.12

@@ -1,0 +1,16 @@
+- name: Install redis
+  apt: name=redis-server state=present update_cache=yes
+
+- name: Configure redis cluster mode for master
+  template: src=redis.conf.j2 dest=/etc/redis/redis.conf
+  notify: redis-server restart
+
+- name: Install redis-trib dependencies
+  apt: name=ruby-redis state=present
+
+- name: redis-master started
+  service: name=redis-server state=started enabled=yes
+
+- name: Join master nodes to cluster
+  shell: redis-cli -h localhost -p 7000 CLUSTER MEET {{ hostvars[hostvars.keys()[0]].ansible_default_ipv4.address }} 7000
+  when: ansible_eth0["ipv4"]["address"] != hostvars[hostvars.keys()[0]].ansible_default_ipv4.address

@@ -1,0 +1,17 @@
+- name: Create working directory for slave
+  file: path=/var/lib/redis-slave owner=redis group=redis mode=0755 state=directory
+
+- name: Create systemctl for slave
+  template: src=redis-slave.service.j2 dest=/lib/systemd/system/redis-slave.service
+  notify:
+    - reload systemctl
+
+- name: Configure redis cluster mode for slave
+  template: src=redis.conf.j2 dest=/etc/redis/redis-slave.conf
+  notify: redis-slave restart
+
+- name: redis-slave started
+  service: name=redis-slave state=started enabled=yes
+
+- name: Join slave nodes to cluster
+  shell: redis-cli -p 8000 CLUSTER MEET {{ ansible_eth0["ipv4"]["address"] }} 7000

@@ -1,0 +1,10 @@
+- name: Assign slots
+  shell: for slot in `seq {{ slot_start }} {{ slot_end }}`;do redis-cli -p 7000 CLUSTER ADDSLOTS $slot;done
+  tags: slot
+
+- name: Get master node-id
+  shell: redis-cli -p 8000 CLUSTER NODES | grep {{ ip_master }} | grep 7000 | awk '{print $1}'
+  register: node_id
+
+- name: Create replicate
+  shell: redis-cli -p 8000 CLUSTER REPLICATE {{ node_id.stdout }}

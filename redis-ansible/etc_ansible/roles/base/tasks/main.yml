@@ -1,0 +1,39 @@
+- name: Set hostname for instance
+  hostname: name={{ hostname }}
+
+- name: Configure hosts file
+  template: src=hosts.j2 dest=/etc/hosts
+
+- name: Add ca certificates
+  apt: name=ca-certificates state=latest
+
+- name: Add redis repo
+  apt_repository:
+    repo="ppa:chris-lea/redis-server"
+    state=present
+
+- name: update open file limit
+  pam_limits:
+    domain=*
+    limit_type=-
+    limit_item=nofile
+    value=20000
+
+- name: Set net.core.somaxconn option
+  sysctl:
+      name=net.core.somaxconn
+      value=10000
+      sysctl_set=yes
+      state=present
+      reload=yes
+
+- name: Set vm.overcommit_memory option
+  sysctl:
+      name=vm.overcommit_memory
+      value=1
+      sysctl_set=yes
+      state=present
+      reload=yes
+
+- name: Disable THP
+  command: echo never > /sys/kernel/mm/transparent_hugepage/enabled

@@ -1,0 +1,15 @@
+- name: Install and Configure Redis Cluster - Loggly
+  hosts: redis-cluster
+  remote_user: ubuntu
+  become: True
+  become_method: sudo
+  gather_facts: False
+  pre_tasks:
+  - raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+  - setup: # aka gather_facts
+  roles:
+  - base
+  - redis-cluster-master
+  - redis-cluster-slave
+  - redis-cluster-slots
+  - loggly
